@@ -17,15 +17,9 @@ export class ProductItem extends Entity {
   })
   name: string;
 
-  @property({
-    type: 'number',
-  })
   @belongsTo(() => ProductCategory)
   categoryId?: number;
 
-  @property({
-    type: 'number',
-  })
   @belongsTo(() => ProductTrend)
   trendId?: number;
 

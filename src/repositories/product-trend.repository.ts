@@ -1,6 +1,6 @@
 import {DefaultCrudRepository} from '@loopback/repository';
 import {ProductTrend, ProductTrendRelations} from '../models';
-import {DatabaseDataSource} from '../datasources';
+import {DbDataSource} from '../datasources';
 import {inject} from '@loopback/core';
 
 export class ProductTrendRepository extends DefaultCrudRepository<
@@ -9,7 +9,7 @@ export class ProductTrendRepository extends DefaultCrudRepository<
   ProductTrendRelations
 > {
   constructor(
-    @inject('datasources.database') dataSource: DatabaseDataSource,
+    @inject('datasources.db') dataSource: DbDataSource,
   ) {
     super(ProductTrend, dataSource);
   }
