@@ -7,8 +7,12 @@ import {
 import {RepositoryMixin} from '@loopback/repository';
 import {RestApplication} from '@loopback/rest';
 import {ServiceMixin} from '@loopback/service-proxy';
-import * as path from 'path';
-import {MySequence} from './sequence';
+import {AuthenticationComponent} from '@loopback/authentication';
+import {MyAuthenticationSequence} from './sequence';
+import {PasswordHasherBindings, TokenServiceBindings, TokenServiceConstants, UserServiceBindings} from "./keys";
+import {BcryptHasher} from "./services/hash.password.bcryptjs";
+import {MyUserService} from "./services/user-service";
+import {JWTService} from "./services/jwt-service";
 
 export class ShopApplication extends BootMixin(
   ServiceMixin(RepositoryMixin(RestApplication)),
@@ -16,17 +20,12 @@ export class ShopApplication extends BootMixin(
   constructor(options: ApplicationConfig = {}) {
     super(options);
 
+    this.component(AuthenticationComponent);
+
     // Set up the custom sequence
-    this.sequence(MySequence);
+    this.sequence(MyAuthenticationSequence);
 
-    // Set up default home page
-    this.static('/', path.join(__dirname, '../public'));
-
-    // Customize @loopback/rest-explorer configuration here
-    this.bind(RestExplorerBindings.CONFIG).to({
-      path: '/explorer',
-    });
-    this.component(RestExplorerComponent);
+    this.setUpBindings();
 
     this.projectRoot = __dirname;
     // Customize @loopback/boot Booter Conventions here
@@ -38,5 +37,29 @@ export class ShopApplication extends BootMixin(
         nested: true,
       },
     };
+  }
+
+  setUpBindings(): void {
+    // Customize @loopback/rest-explorer configuration here
+    this.bind(RestExplorerBindings.CONFIG).to({
+      path: '/explorer',
+    });
+    this.component(RestExplorerComponent);
+
+    this.bind(TokenServiceBindings.TOKEN_SECRET).to(
+        TokenServiceConstants.TOKEN_SECRET_VALUE,
+    );
+
+    this.bind(TokenServiceBindings.TOKEN_EXPIRES_IN).to(
+        TokenServiceConstants.TOKEN_EXPIRES_IN_VALUE,
+    );
+
+    this.bind(TokenServiceBindings.TOKEN_SERVICE).toClass(JWTService);
+
+    // Bind bcrypt hash services - utilized by 'UserController' and 'MyUserService'
+    this.bind(PasswordHasherBindings.ROUNDS).to(10);
+    this.bind(PasswordHasherBindings.PASSWORD_HASHER).toClass(BcryptHasher);
+
+    this.bind(UserServiceBindings.USER_SERVICE).toClass(MyUserService);
   }
 }
