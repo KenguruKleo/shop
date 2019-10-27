@@ -112,8 +112,11 @@ export class ProductItemController {
       },
     },
   })
-  async findById(@param.path.number('id') id: number): Promise<ProductItem> {
-    return this.productItemRepository.findById(id);
+  async findById(
+      @param.path.number('id') id: number,
+      @param.query.object('filter', getFilterSchemaFor(ProductItem)) filter?: Filter<ProductItem>,
+  ): Promise<ProductItem> {
+    return this.productItemRepository.findById(id, filter);
   }
 
   @patch('/product-items/{id}', {

@@ -1,6 +1,6 @@
 import {belongsTo, Entity, model, property} from '@loopback/repository';
-import {ProductTrend} from "./product-trend.model";
 import {ProductCategory} from "./product-category.model";
+import {ProductTrend} from './product-trend.model';
 
 @model({settings: {strict: false}})
 export class ProductItem extends Entity {
@@ -17,12 +17,6 @@ export class ProductItem extends Entity {
   })
   name: string;
 
-  @belongsTo(() => ProductCategory)
-  categoryId?: number;
-
-  @belongsTo(() => ProductTrend)
-  trendId?: number;
-
   @property({
     type: 'string',
   })
@@ -38,6 +32,11 @@ export class ProductItem extends Entity {
   })
   codeCatalog?: string;
 
+  @belongsTo(() => ProductCategory)
+  productCategoryId: number;
+
+  @belongsTo(() => ProductTrend)
+  productTrendId: number;
   // Define well-known properties here
 
   // Indexer property to allow additional data
