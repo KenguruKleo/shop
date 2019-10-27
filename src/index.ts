@@ -1,16 +1,15 @@
 import {ShopApplication} from './application';
 import {ApplicationConfig} from '@loopback/core';
+import {ExpressServer} from "./server";
 
-export {ShopApplication};
+export {ExpressServer, ShopApplication};
 
 export async function main(options: ApplicationConfig = {}) {
-  const app = new ShopApplication(options);
-  await app.boot();
-  await app.start();
+  const server = new ExpressServer(options);
+  await server.boot();
+  await server.start();
 
-  const url = app.restServer.url;
+  const url = server.getApiPath();
   console.log(`Server is running at ${url}`);
   console.log(`Try ${url}/ping`);
-
-  return app;
 }
