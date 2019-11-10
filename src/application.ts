@@ -7,12 +7,23 @@ import {
 import {RepositoryMixin} from '@loopback/repository';
 import {RestApplication} from '@loopback/rest';
 import {ServiceMixin} from '@loopback/service-proxy';
-import {AuthenticationComponent} from '@loopback/authentication';
+import {AuthenticationComponent, registerAuthenticationStrategy} from '@loopback/authentication';
 import {MyAuthenticationSequence} from './sequence';
 import {PasswordHasherBindings, TokenServiceBindings, TokenServiceConstants, UserServiceBindings} from "./keys";
 import {BcryptHasher} from "./services/hash.password.bcryptjs";
 import {MyUserService} from "./services/user-service";
 import {JWTService} from "./services/jwt-service";
+import {SECURITY_SCHEME_SPEC} from './utils/security-spec';
+import {JWTAuthenticationStrategy} from './authentication-strategies/jwt-strategy';
+
+export interface PackageInfo {
+  name: string;
+  version: string;
+  description: string;
+}
+export const PackageKey = BindingKey.create<PackageInfo>('application.package');
+
+const pkg: PackageInfo = require('../package.json');
 
 export class ShopApplication extends BootMixin(
   ServiceMixin(RepositoryMixin(RestApplication)),
@@ -20,12 +31,31 @@ export class ShopApplication extends BootMixin(
   constructor(options: ApplicationConfig = {}) {
     super(options);
 
+    this.api({
+      openapi: '3.0.0',
+      info: {title: pkg.name, version: pkg.version},
+      paths: {},
+      components: {securitySchemes: SECURITY_SCHEME_SPEC},
+      servers: [{url: '/'}],
+    });
+
+    this.setUpBindings();
+
     this.component(AuthenticationComponent);
+
+    registerAuthenticationStrategy(this, JWTAuthenticationStrategy);
 
     // Set up the custom sequence
     this.sequence(MyAuthenticationSequence);
 
-    this.setUpBindings();
+    // Set up default home page
+    // this.static('/', path.join(__dirname, '../public'));
+
+    // Customize @loopback/rest-explorer configuration here
+    this.bind(RestExplorerBindings.CONFIG).to({
+      path: '/explorer',
+    });
+    this.component(RestExplorerComponent);
 
     this.projectRoot = __dirname;
     // Customize @loopback/boot Booter Conventions here
@@ -40,11 +70,7 @@ export class ShopApplication extends BootMixin(
   }
 
   setUpBindings(): void {
-    // Customize @loopback/rest-explorer configuration here
-    this.bind(RestExplorerBindings.CONFIG).to({
-      path: '/explorer',
-    });
-    this.component(RestExplorerComponent);
+    this.bind(PackageKey).to(pkg);
 
     this.bind(TokenServiceBindings.TOKEN_SECRET).to(
         TokenServiceConstants.TOKEN_SECRET_VALUE,

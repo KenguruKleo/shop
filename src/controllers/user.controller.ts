@@ -5,6 +5,7 @@ import {
   repository,
   Where,
 } from '@loopback/repository';
+import {UserProfile, securityId, SecurityBindings} from '@loopback/security';
 import {
   post,
   param,
@@ -22,10 +23,21 @@ import {UserRepository} from '../repositories';
 import {PasswordHasherBindings, TokenServiceBindings, UserServiceBindings} from "../keys";
 import {inject} from "@loopback/context";
 import {PasswordHasher} from "../services/hash.password.bcryptjs";
-import {TokenService, UserService} from "@loopback/authentication";
+import {authenticate, TokenService, UserService} from "@loopback/authentication";
 import {validateCredentials} from "../services/validator";
+import {OPERATION_SECURITY_SPEC} from "../utils/security-spec";
 
 const uuidv1 = require('uuid/v1');
+
+export const UserProfileSchema = {
+  type: 'object',
+  required: ['id'],
+  properties: {
+    id: {type: 'string'},
+    email: {type: 'string'},
+    name: {type: 'string'},
+  },
+};
 
 export class UserController {
   constructor(
@@ -118,6 +130,28 @@ export class UserController {
     const token = await this.jwtService.generateToken(userProfile);
 
     return {token};
+  }
+
+  @get('/users/me', {
+    security: OPERATION_SECURITY_SPEC,
+    responses: {
+      '200': {
+        description: 'The current user profile',
+        content: {
+          'application/json': {
+            schema: UserProfileSchema,
+          },
+        },
+      },
+    },
+  })
+  @authenticate('jwt')
+  async printCurrentUser(
+      @inject(SecurityBindings.USER) currentUserProfile: UserProfile,
+  ): Promise<UserProfile> {
+    currentUserProfile.id = currentUserProfile[securityId];
+    delete currentUserProfile[securityId];
+    return currentUserProfile;
   }
 
   @get('/users/count', {
