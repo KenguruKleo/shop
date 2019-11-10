@@ -1,6 +1,6 @@
 import {HttpErrors} from '@loopback/rest';
-import {Credentials, UserRepository} from '../repositories';
-import {User} from '../models';
+import {UserRepository} from '../repositories';
+import {User, Credentials} from '../models';
 import {UserService} from '@loopback/authentication';
 import {UserProfile, securityId} from '@loopback/security';
 import {repository} from '@loopback/repository';

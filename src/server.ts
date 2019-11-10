@@ -9,8 +9,10 @@ export class ExpressServer {
 	private app: express.Application;
 	private lbApp: ShopApplication;
 	private server: http.Server;
+	private options: ApplicationConfig;
 
 	constructor(options: ApplicationConfig = {}) {
+		this.options = options;
 		this.app = express();
 		this.lbApp = new ShopApplication(options);
 
@@ -33,13 +35,13 @@ export class ExpressServer {
 	}
 
 	public getApiPath(): string {
-		return <string>this.lbApp.restServer.url;
+		return <string>`${this.options.rest.host}:${this.options.rest.port}`;
 	}
 
 	public async start() {
 		await this.lbApp.start();
-		const port = this.lbApp.restServer.config.port || 3000;
-		const host = this.lbApp.restServer.config.host || '127.0.0.1';
+		const port = this.options.rest.port;
+		const host = this.options.host;
 		this.server = this.app.listen(port, host);
 	}
 

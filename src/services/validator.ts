@@ -1,4 +1,4 @@
-import {Credentials} from '../repositories';
+import {Credentials} from '../models';
 import * as isemail from 'isemail';
 import {HttpErrors} from '@loopback/rest';
 
