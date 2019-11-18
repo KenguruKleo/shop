@@ -6,21 +6,12 @@ export async function migrate(args: string[]) {
 
   const app = new ShopApplication();
   await app.boot();
-  await app.migrateSchema({
-    existingSchema,
-    // The order of table creation is important.
-    // A referenced table must exist before creating a
-    // foreign key constraint.
-    // For PostgreSQL connector, it does not create tables in the
-    // right order.  Therefore, this change is needed.
-    models: [
-      'ProductCategory',
-      'ProductTrend',
-      'ProductItem',
-      'ProductItemModification',
-      'User',
-    ],
-  });
+
+  await app.migrateSchema({ existingSchema, models: [ 'User'] });
+  await app.migrateSchema({ existingSchema, models: [ 'ProductCategory'] });
+  await app.migrateSchema({ existingSchema, models: [ 'ProductTrend'] });
+  await app.migrateSchema({ existingSchema, models: [ 'ProductItem'] });
+  await app.migrateSchema({ existingSchema, models: [ 'ProductItemModification'] });
 
   // Connectors usually keep a pool of opened connections,
   // this keeps the process running even after all work is done.

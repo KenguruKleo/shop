@@ -1,9 +1,11 @@
 import {
   Count,
   CountSchema,
-  Filter,
+  Filter, model,
   repository,
   Where,
+  MODEL_PROPERTIES_KEY,
+  MODEL_WITH_PROPERTIES_KEY,
 } from '@loopback/repository';
 import {UserProfile, securityId, SecurityBindings} from '@loopback/security';
 import {
@@ -18,16 +20,26 @@ import {
   del,
   requestBody,
 } from '@loopback/rest';
+import { MetadataInspector } from '@loopback/metadata';
+import {inject} from "@loopback/context";
+
 import {User, Credentials} from '../models';
 import {UserRepository} from '../repositories';
 import {PasswordHasherBindings, TokenServiceBindings, UserServiceBindings} from "../keys";
-import {inject} from "@loopback/context";
 import {PasswordHasher} from "../services/hash.password.bcryptjs";
 import {authenticate, TokenService, UserService} from "@loopback/authentication";
 import {validateCredentials} from "../services/validator";
 import {OPERATION_SECURITY_SPEC} from "../utils/security-spec";
 
 const uuidv1 = require('uuid/v1');
+
+@model()
+class UserWithoutCredentials extends User {}
+delete UserWithoutCredentials.definition.properties['password'];
+
+const meta = MetadataInspector.getAllPropertyMetadata<UserWithoutCredentials>(MODEL_PROPERTIES_KEY, UserWithoutCredentials.prototype) || {};
+delete meta['password'];
+MetadataInspector.defineMetadata(MODEL_WITH_PROPERTIES_KEY.key, meta, UserWithoutCredentials);
 
 export const UserProfileSchema = {
   type: 'object',
@@ -58,6 +70,7 @@ export class UserController {
       },
     },
   })
+  //@authenticate('jwt')
   async create(
     @requestBody({
       content: {
@@ -162,6 +175,7 @@ export class UserController {
       },
     },
   })
+  @authenticate('jwt')
   async count(
     @param.query.object('where', getWhereSchemaFor(User)) where?: Where<User>,
   ): Promise<Count> {
@@ -174,16 +188,18 @@ export class UserController {
         description: 'Array of User model instances',
         content: {
           'application/json': {
-            schema: {type: 'array', items: getModelSchemaRef(User)},
+            schema: {type: 'array', items: getModelSchemaRef(UserWithoutCredentials)},
           },
         },
       },
     },
   })
+  @authenticate('jwt')
   async find(
-    @param.query.object('filter', getFilterSchemaFor(User)) filter?: Filter<User>,
-  ): Promise<User[]> {
-    return this.userRepository.find(filter);
+    @param.query.object('filter', getFilterSchemaFor(UserWithoutCredentials)) filter?: Filter<UserWithoutCredentials>,
+  ): Promise<UserWithoutCredentials[]> {
+    const res = await this.userRepository.find(filter);
+    return res.map(({ password, ...item}) => <UserWithoutCredentials>item);
   }
 
   @patch('/users', {
@@ -194,6 +210,7 @@ export class UserController {
       },
     },
   })
+  @authenticate('jwt')
   async updateAll(
     @requestBody({
       content: {
@@ -216,6 +233,7 @@ export class UserController {
       },
     },
   })
+  @authenticate('jwt')
   async findById(@param.path.number('id') id: string): Promise<User> {
     return this.userRepository.findById(id);
   }
@@ -227,6 +245,7 @@ export class UserController {
       },
     },
   })
+  @authenticate('jwt')
   async updateById(
     @param.path.number('id') id: string,
     @requestBody({
@@ -248,6 +267,7 @@ export class UserController {
       },
     },
   })
+  @authenticate('jwt')
   async replaceById(
     @param.path.number('id') id: string,
     @requestBody() user: User,
@@ -262,6 +282,7 @@ export class UserController {
       },
     },
   })
+  @authenticate('jwt')
   async deleteById(@param.path.number('id') id: string): Promise<void> {
     await this.userRepository.deleteById(id);
   }
