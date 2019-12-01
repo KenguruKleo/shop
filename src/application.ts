@@ -1,5 +1,6 @@
 import {BootMixin} from '@loopback/boot';
 import {ApplicationConfig, BindingKey} from '@loopback/core';
+import {inject} from "@loopback/context";
 import {
   RestExplorerBindings,
   RestExplorerComponent,
@@ -8,6 +9,7 @@ import {RepositoryMixin} from '@loopback/repository';
 import {RestApplication} from '@loopback/rest';
 import {ServiceMixin} from '@loopback/service-proxy';
 import {AuthenticationComponent, registerAuthenticationStrategy} from '@loopback/authentication';
+
 import {MyAuthenticationSequence} from './sequence';
 import {PasswordHasherBindings, TokenServiceBindings, TokenServiceConstants, UserServiceBindings} from "./keys";
 import {BcryptHasher} from "./services/hash.password.bcryptjs";
@@ -15,6 +17,7 @@ import {MyUserService} from "./services/user-service";
 import {JWTService} from "./services/jwt-service";
 import {SECURITY_SCHEME_SPEC} from './utils/security-spec';
 import {JWTAuthenticationStrategy} from './authentication-strategies/jwt-strategy';
+import {AuthorizationComponent} from "./authorization";
 
 export interface PackageInfo {
   name: string;
@@ -42,6 +45,7 @@ export class ShopApplication extends BootMixin(
     this.setUpBindings();
 
     this.component(AuthenticationComponent);
+    this.component(AuthorizationComponent);
 
     registerAuthenticationStrategy(this, JWTAuthenticationStrategy);
 

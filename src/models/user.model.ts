@@ -3,11 +3,11 @@ import {
 	Entity,
 	model,
 	MODEL_WITH_PROPERTIES_KEY,
-	//MODEL_PROPERTIES_KEY,
-	//ModelDefinition,
 	property
 } from '@loopback/repository';
 import { MetadataInspector } from '@loopback/metadata';
+
+import {UserPermission} from "../authorization";
 
 @model({
 	settings: {
@@ -52,6 +52,9 @@ export class User extends Entity {
 		type: 'string',
 	})
 	lastName?: string;
+
+	@property.array(String)
+	permissions: UserPermission[];
 
 	constructor(data?: Partial<User>) {
 		super(data);

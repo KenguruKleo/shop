@@ -8,6 +8,7 @@ import {
   RestBindings,
   Send,
   SequenceHandler,
+  HttpErrors,
 } from '@loopback/rest';
 import {
   AuthenticationBindings,
@@ -15,6 +16,13 @@ import {
   AUTHENTICATION_STRATEGY_NOT_FOUND,
   USER_PROFILE_NOT_FOUND,
 } from '@loopback/authentication';
+import {
+  AuthorizationBindings,
+  AuthorizeFn,
+  UserPermissionsFn,
+  AuthorizeErrorKeys, PermissionKey,
+} from './authorization';
+import { UserProfile } from '@loopback/security';
 
 const SequenceActions = RestBindings.SequenceActions;
 
@@ -26,8 +34,14 @@ export class MyAuthenticationSequence implements SequenceHandler {
       @inject(SequenceActions.INVOKE_METHOD) protected invoke: InvokeMethod,
       @inject(SequenceActions.SEND) protected send: Send,
       @inject(SequenceActions.REJECT) protected reject: Reject,
+
       @inject(AuthenticationBindings.AUTH_ACTION)
       protected authenticateRequest: AuthenticateFn,
+
+      @inject(AuthorizationBindings.USER_PERMISSIONS)
+      protected fetchUserPermissions: UserPermissionsFn,
+      @inject(AuthorizationBindings.AUTHORIZE_ACTION)
+      protected checkAuthorization: AuthorizeFn,
   ) {}
 
   async handle(context: RequestContext) {
@@ -36,7 +50,23 @@ export class MyAuthenticationSequence implements SequenceHandler {
       const route = this.findRoute(request);
 
       //call authentication action
-      await this.authenticateRequest(request);
+      const authUser: UserProfile | undefined = await this.authenticateRequest(request);
+      console.log('authUser', authUser);
+
+      if (authUser) {
+        const permissions: PermissionKey[] = this.fetchUserPermissions(
+            authUser.permissions,
+            authUser.role.permissions,
+        );
+        // This is main line added to sequence
+        // where we are invoking the authorize action function to check for access
+        const isAccessAllowed: boolean = await this.checkAuthorization(
+            permissions,
+        );
+        if (!isAccessAllowed) {
+          throw new HttpErrors.Forbidden(AuthorizeErrorKeys.NotAllowedAccess);
+        }
+      }
 
       // Authentication successful, proceed to invoke controller
       const args = await this.parseParams(request, route);

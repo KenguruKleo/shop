@@ -6,5 +6,6 @@
   "port": 0,
   "user": "",
   "password": "",
-  "database": ""
+  "database": "",
+  "connectionTimeout": 20000
 }
