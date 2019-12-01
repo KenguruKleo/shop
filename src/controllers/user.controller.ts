@@ -1,11 +1,9 @@
 import {
   Count,
   CountSchema,
-  Filter, model,
+  Filter,
   repository,
   Where,
-  MODEL_PROPERTIES_KEY,
-  MODEL_WITH_PROPERTIES_KEY,
 } from '@loopback/repository';
 import {UserProfile, securityId, SecurityBindings} from '@loopback/security';
 import {
@@ -20,11 +18,10 @@ import {
   del,
   requestBody,
 } from '@loopback/rest';
-import { MetadataInspector } from '@loopback/metadata';
 import {inject} from "@loopback/context";
 
-import {User, Credentials} from '../models';
-import {UserRepository} from '../repositories';
+import {User, Credentials, UserWithoutCredentials} from '../models';
+import {UserRepository, UserWithoutCredentialsRepository} from '../repositories';
 import {PasswordHasherBindings, TokenServiceBindings, UserServiceBindings} from "../keys";
 import {PasswordHasher} from "../services/hash.password.bcryptjs";
 import {authenticate, TokenService, UserService} from "@loopback/authentication";
@@ -32,14 +29,6 @@ import {validateCredentials} from "../services/validator";
 import {OPERATION_SECURITY_SPEC} from "../utils/security-spec";
 
 const uuidv1 = require('uuid/v1');
-
-@model()
-class UserWithoutCredentials extends User {}
-delete UserWithoutCredentials.definition.properties['password'];
-
-const meta = MetadataInspector.getAllPropertyMetadata<UserWithoutCredentials>(MODEL_PROPERTIES_KEY, UserWithoutCredentials.prototype) || {};
-delete meta['password'];
-MetadataInspector.defineMetadata(MODEL_WITH_PROPERTIES_KEY.key, meta, UserWithoutCredentials);
 
 export const UserProfileSchema = {
   type: 'object',
@@ -54,6 +43,7 @@ export const UserProfileSchema = {
 export class UserController {
   constructor(
       @repository(UserRepository) public userRepository: UserRepository,
+      @repository(UserWithoutCredentialsRepository) public userWithoutCredentialsRepository: UserWithoutCredentialsRepository,
       @inject(PasswordHasherBindings.PASSWORD_HASHER)
       public passwordHasher: PasswordHasher,
       @inject(TokenServiceBindings.TOKEN_SERVICE)
@@ -70,7 +60,7 @@ export class UserController {
       },
     },
   })
-  //@authenticate('jwt')
+  @authenticate('jwt')
   async create(
     @requestBody({
       content: {
@@ -198,8 +188,9 @@ export class UserController {
   async find(
     @param.query.object('filter', getFilterSchemaFor(UserWithoutCredentials)) filter?: Filter<UserWithoutCredentials>,
   ): Promise<UserWithoutCredentials[]> {
-    const res = await this.userRepository.find(filter);
-    return res.map(({ password, ...item}) => <UserWithoutCredentials>item);
+    const res = await this.userWithoutCredentialsRepository.find(filter);
+    //return res.map(({ password, ...item}) => <User>item);
+    return res;
   }
 
   @patch('/users', {

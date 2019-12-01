@@ -1,4 +1,13 @@
-import {Entity, model, property} from '@loopback/repository';
+import { cloneDeep } from 'lodash';
+import {
+	Entity,
+	model,
+	MODEL_WITH_PROPERTIES_KEY,
+	//MODEL_PROPERTIES_KEY,
+	//ModelDefinition,
+	property
+} from '@loopback/repository';
+import { MetadataInspector } from '@loopback/metadata';
 
 @model({
 	settings: {
@@ -12,6 +21,7 @@ import {Entity, model, property} from '@loopback/repository';
 				},
 			},
 		},
+		hiddenProperties: ['password'],
 	},
 })
 export class User extends Entity {
@@ -47,6 +57,19 @@ export class User extends Entity {
 		super(data);
 	}
 }
+
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+const userDefinition = cloneDeep(User.definition);
+delete userDefinition.properties['password'];
+
+@model(userDefinition)
+export class UserWithoutCredentials extends Entity {
+	constructor(data?: Partial<UserWithoutCredentials>) {
+		super(data);
+	}
+}
+MetadataInspector.defineMetadata(MODEL_WITH_PROPERTIES_KEY.key, userDefinition, UserWithoutCredentials);
+
 
 export interface UserRelations {
 	// describe navigational properties here
