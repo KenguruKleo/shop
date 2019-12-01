@@ -1,5 +1,8 @@
-import {ShopApplication} from './application';
+require('dotenv').config();
+
 import {ApplicationConfig} from '@loopback/core';
+
+import {ShopApplication} from './application';
 import {ExpressServer} from "./server";
 
 export {ExpressServer, ShopApplication};

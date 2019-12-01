@@ -4,8 +4,8 @@ import {TokenService, UserService} from '@loopback/authentication';
 import {User, Credentials} from './models';
 
 export namespace TokenServiceConstants {
-	export const TOKEN_SECRET_VALUE = 'myjwts3cr3tkleo';
-	export const TOKEN_EXPIRES_IN_VALUE = '600';
+	export const TOKEN_SECRET_VALUE = <string>process.env.TOKEN_SECRET_VALUE;
+	export const TOKEN_EXPIRES_IN_VALUE = <string>process.env.TOKEN_EXPIRES_IN_VALUE;
 }
 
 export namespace TokenServiceBindings {

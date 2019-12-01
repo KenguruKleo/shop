@@ -58,7 +58,6 @@ export class User extends Entity {
 	}
 }
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const userDefinition = cloneDeep(User.definition);
 delete userDefinition.properties['password'];
 

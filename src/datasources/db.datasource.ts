@@ -14,7 +14,10 @@ export class DbDataSource extends juggler.DataSource
 
   constructor(
     @inject('datasources.config.db', {optional: true})
-    dsConfig: object = config,
+    dsConfig: object = {
+      ...config,
+      url: process.env.DATA_SOURCE_DB_URL,
+    },
   ) {
     super(dsConfig);
   }
