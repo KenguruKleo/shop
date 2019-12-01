@@ -18,7 +18,7 @@ export class UserRepository extends DefaultCrudRepository<
 
 export class UserWithoutCredentialsRepository extends DefaultCrudRepository<
     UserWithoutCredentials,
-    undefined,
+    string,
     {}
     > {
   constructor(

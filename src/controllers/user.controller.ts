@@ -30,16 +30,6 @@ import {OPERATION_SECURITY_SPEC} from "../utils/security-spec";
 
 const uuidv1 = require('uuid/v1');
 
-export const UserProfileSchema = {
-  type: 'object',
-  required: ['id'],
-  properties: {
-    id: {type: 'string'},
-    email: {type: 'string'},
-    name: {type: 'string'},
-  },
-};
-
 export class UserController {
   constructor(
       @repository(UserRepository) public userRepository: UserRepository,
@@ -56,7 +46,7 @@ export class UserController {
     responses: {
       '200': {
         description: 'User model instance',
-        content: {'application/json': {schema: getModelSchemaRef(User)}},
+        content: {'application/json': {schema: getModelSchemaRef(UserWithoutCredentials)}},
       },
     },
   })
@@ -73,7 +63,7 @@ export class UserController {
       },
     })
     user: Omit<User, 'id'>,
-  ): Promise<User> {
+  ): Promise<UserWithoutCredentials> {
     // ensure a valid email value and password value
     const { email, password } = user;
     const credentials = new Credentials({ email, password });
@@ -86,9 +76,8 @@ export class UserController {
       id: uuidv1(),
     };
 
-    // create the new user
-    const savedUser = await this.userRepository.create(newUser);
-    delete savedUser.password;
+    // create the new user and remove credential info from result
+    const savedUser = <UserWithoutCredentials>await this.userRepository.create(newUser);
 
     return savedUser;
   }
@@ -102,9 +91,7 @@ export class UserController {
             schema: {
               type: 'object',
               properties: {
-                token: {
-                  type: 'string',
-                },
+                token: { type: 'string' },
               },
             },
           },
@@ -140,47 +127,37 @@ export class UserController {
     responses: {
       '200': {
         description: 'The current user profile',
-        content: {
-          'application/json': {
-            schema: UserProfileSchema,
-          },
-        },
+        content: { 'application/json': { schema: getModelSchemaRef(UserWithoutCredentials) } },
       },
     },
   })
   @authenticate('jwt')
   async printCurrentUser(
       @inject(SecurityBindings.USER) currentUserProfile: UserProfile,
-  ): Promise<UserProfile> {
-    currentUserProfile.id = currentUserProfile[securityId];
-    delete currentUserProfile[securityId];
-    return currentUserProfile;
+  ): Promise<UserWithoutCredentials> {
+    return this.userWithoutCredentialsRepository.findById(currentUserProfile[securityId])
   }
 
   @get('/users/count', {
     responses: {
       '200': {
-        description: 'User model count',
+        description: 'User without credentials repository model count',
         content: {'application/json': {schema: CountSchema}},
       },
     },
   })
   @authenticate('jwt')
   async count(
-    @param.query.object('where', getWhereSchemaFor(User)) where?: Where<User>,
+    @param.query.object('where', getWhereSchemaFor(UserWithoutCredentials)) where?: Where<UserWithoutCredentials>,
   ): Promise<Count> {
-    return this.userRepository.count(where);
+    return this.userWithoutCredentialsRepository.count(where);
   }
 
   @get('/users', {
     responses: {
       '200': {
-        description: 'Array of User model instances',
-        content: {
-          'application/json': {
-            schema: {type: 'array', items: getModelSchemaRef(UserWithoutCredentials)},
-          },
-        },
+        description: 'Array of User without credentials repository model instances',
+        content: { 'application/json': { schema: {type: 'array', items: getModelSchemaRef(UserWithoutCredentials)} } },
       },
     },
   })
@@ -188,16 +165,14 @@ export class UserController {
   async find(
     @param.query.object('filter', getFilterSchemaFor(UserWithoutCredentials)) filter?: Filter<UserWithoutCredentials>,
   ): Promise<UserWithoutCredentials[]> {
-    const res = await this.userWithoutCredentialsRepository.find(filter);
-    //return res.map(({ password, ...item}) => <User>item);
-    return res;
+    return this.userWithoutCredentialsRepository.find(filter);
   }
 
   @patch('/users', {
     responses: {
       '200': {
         description: 'User PATCH success count',
-        content: {'application/json': {schema: CountSchema}},
+        content: {'application/json': {schema: UserWithoutCredentials}},
       },
     },
   })
@@ -206,75 +181,75 @@ export class UserController {
     @requestBody({
       content: {
         'application/json': {
-          schema: getModelSchemaRef(User, {partial: true}),
+          schema: getModelSchemaRef(UserWithoutCredentials, {partial: true}),
         },
       },
     })
-    user: User,
-    @param.query.object('where', getWhereSchemaFor(User)) where?: Where<User>,
+    user: UserWithoutCredentials,
+    @param.query.object('where', getWhereSchemaFor(UserWithoutCredentials)) where?: Where<UserWithoutCredentials>,
   ): Promise<Count> {
-    return this.userRepository.updateAll(user, where);
+    return this.userWithoutCredentialsRepository.updateAll(user, where);
   }
 
   @get('/users/{id}', {
     responses: {
       '200': {
-        description: 'User model instance',
-        content: {'application/json': {schema: getModelSchemaRef(User)}},
+        description: 'User without credentials repository model instance',
+        content: {'application/json': {schema: getModelSchemaRef(UserWithoutCredentials)}},
       },
     },
   })
   @authenticate('jwt')
-  async findById(@param.path.number('id') id: string): Promise<User> {
-    return this.userRepository.findById(id);
+  async findById(@param.path.string('id') id: string): Promise<UserWithoutCredentials> {
+    return this.userWithoutCredentialsRepository.findById(id);
   }
 
   @patch('/users/{id}', {
     responses: {
       '204': {
-        description: 'User PATCH success',
+        description: 'User without credentials repository model PATCH success',
       },
     },
   })
   @authenticate('jwt')
   async updateById(
-    @param.path.number('id') id: string,
+    @param.path.string('id') id: string,
     @requestBody({
       content: {
         'application/json': {
-          schema: getModelSchemaRef(User, {partial: true}),
+          schema: getModelSchemaRef(UserWithoutCredentials, {partial: true}),
         },
       },
     })
-    user: User,
+    user: UserWithoutCredentials,
   ): Promise<void> {
-    await this.userRepository.updateById(id, user);
+    await this.userWithoutCredentialsRepository.updateById(id, user);
   }
 
   @put('/users/{id}', {
     responses: {
       '204': {
-        description: 'User PUT success',
+        description: 'User without credentials repository model PUT success',
       },
     },
   })
   @authenticate('jwt')
   async replaceById(
-    @param.path.number('id') id: string,
-    @requestBody() user: User,
+    @param.path.string('id') id: string,
+    @requestBody() user: UserWithoutCredentials,
   ): Promise<void> {
-    await this.userRepository.replaceById(id, user);
+    await this.userWithoutCredentialsRepository.replaceById(id, user);
   }
 
   @del('/users/{id}', {
     responses: {
       '204': {
-        description: 'User DELETE success',
+        description: 'User without credentials repository model DELETE success',
       },
     },
   })
   @authenticate('jwt')
-  async deleteById(@param.path.number('id') id: string): Promise<void> {
-    await this.userRepository.deleteById(id);
+  async deleteById(@param.path.string('id') id: string): Promise<void> {
+    await this.userWithoutCredentialsRepository.deleteById(id);
   }
 }
