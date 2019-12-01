@@ -43,6 +43,7 @@ export class UserController {
   ) {}
 
   @post('/users', {
+    security: OPERATION_SECURITY_SPEC,
     responses: {
       '200': {
         description: 'User model instance',
@@ -139,6 +140,7 @@ export class UserController {
   }
 
   @get('/users/count', {
+    security: OPERATION_SECURITY_SPEC,
     responses: {
       '200': {
         description: 'User without credentials repository model count',
@@ -154,6 +156,7 @@ export class UserController {
   }
 
   @get('/users', {
+    security: OPERATION_SECURITY_SPEC,
     responses: {
       '200': {
         description: 'Array of User without credentials repository model instances',
@@ -169,6 +172,7 @@ export class UserController {
   }
 
   @patch('/users', {
+    security: OPERATION_SECURITY_SPEC,
     responses: {
       '200': {
         description: 'User PATCH success count',
@@ -192,6 +196,7 @@ export class UserController {
   }
 
   @get('/users/{id}', {
+    security: OPERATION_SECURITY_SPEC,
     responses: {
       '200': {
         description: 'User without credentials repository model instance',
@@ -205,6 +210,7 @@ export class UserController {
   }
 
   @patch('/users/{id}', {
+    security: OPERATION_SECURITY_SPEC,
     responses: {
       '204': {
         description: 'User without credentials repository model PATCH success',
@@ -227,6 +233,7 @@ export class UserController {
   }
 
   @put('/users/{id}', {
+    security: OPERATION_SECURITY_SPEC,
     responses: {
       '204': {
         description: 'User without credentials repository model PUT success',
@@ -242,6 +249,7 @@ export class UserController {
   }
 
   @del('/users/{id}', {
+    security: OPERATION_SECURITY_SPEC,
     responses: {
       '204': {
         description: 'User without credentials repository model DELETE success',

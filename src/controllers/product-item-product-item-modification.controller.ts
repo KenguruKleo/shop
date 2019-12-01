@@ -20,6 +20,8 @@ import {
   ProductItemModification,
 } from '../models';
 import {ProductItemRepository} from '../repositories';
+import {authenticate} from "@loopback/authentication";
+import {OPERATION_SECURITY_SPEC} from "../utils/security-spec";
 
 export class ProductItemProductItemModificationController {
   constructor(
@@ -46,6 +48,7 @@ export class ProductItemProductItemModificationController {
   }
 
   @post('/product-items/{id}/product-item-modifications', {
+    security: OPERATION_SECURITY_SPEC,
     responses: {
       '200': {
         description: 'ProductItem model instance',
@@ -53,6 +56,7 @@ export class ProductItemProductItemModificationController {
       },
     },
   })
+  @authenticate('jwt')
   async create(
     @param.path.number('id') id: typeof ProductItem.prototype.id,
     @requestBody({
@@ -71,6 +75,7 @@ export class ProductItemProductItemModificationController {
   }
 
   @patch('/product-items/{id}/product-item-modifications', {
+    security: OPERATION_SECURITY_SPEC,
     responses: {
       '200': {
         description: 'ProductItem.ProductItemModification PATCH success count',
@@ -78,6 +83,7 @@ export class ProductItemProductItemModificationController {
       },
     },
   })
+  @authenticate('jwt')
   async patch(
     @param.path.number('id') id: number,
     @requestBody({
@@ -94,6 +100,7 @@ export class ProductItemProductItemModificationController {
   }
 
   @del('/product-items/{id}/product-item-modifications', {
+    security: OPERATION_SECURITY_SPEC,
     responses: {
       '200': {
         description: 'ProductItem.ProductItemModification DELETE success count',
@@ -101,6 +108,7 @@ export class ProductItemProductItemModificationController {
       },
     },
   })
+  @authenticate('jwt')
   async delete(
     @param.path.number('id') id: number,
     @param.query.object('where', getWhereSchemaFor(ProductItemModification)) where?: Where<ProductItemModification>,

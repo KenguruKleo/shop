@@ -19,6 +19,8 @@ import {
 } from '@loopback/rest';
 import {ProductItem} from '../models';
 import {ProductItemRepository} from '../repositories';
+import {authenticate} from "@loopback/authentication";
+import {OPERATION_SECURITY_SPEC} from "../utils/security-spec";
 
 export class ProductItemController {
   constructor(
@@ -27,6 +29,7 @@ export class ProductItemController {
   ) {}
 
   @post('/product-items', {
+    security: OPERATION_SECURITY_SPEC,
     responses: {
       '200': {
         description: 'ProductItem model instance',
@@ -34,6 +37,7 @@ export class ProductItemController {
       },
     },
   })
+  @authenticate('jwt')
   async create(
     @requestBody({
       content: {
@@ -83,6 +87,7 @@ export class ProductItemController {
   }
 
   @patch('/product-items', {
+    security: OPERATION_SECURITY_SPEC,
     responses: {
       '200': {
         description: 'ProductItem PATCH success count',
@@ -90,6 +95,7 @@ export class ProductItemController {
       },
     },
   })
+  @authenticate('jwt')
   async updateAll(
     @requestBody({
       content: {
@@ -120,12 +126,14 @@ export class ProductItemController {
   }
 
   @patch('/product-items/{id}', {
+    security: OPERATION_SECURITY_SPEC,
     responses: {
       '204': {
         description: 'ProductItem PATCH success',
       },
     },
   })
+  @authenticate('jwt')
   async updateById(
     @param.path.number('id') id: number,
     @requestBody({
@@ -141,12 +149,14 @@ export class ProductItemController {
   }
 
   @put('/product-items/{id}', {
+    security: OPERATION_SECURITY_SPEC,
     responses: {
       '204': {
         description: 'ProductItem PUT success',
       },
     },
   })
+  @authenticate('jwt')
   async replaceById(
     @param.path.number('id') id: number,
     @requestBody() productItem: ProductItem,
@@ -155,12 +165,14 @@ export class ProductItemController {
   }
 
   @del('/product-items/{id}', {
+    security: OPERATION_SECURITY_SPEC,
     responses: {
       '204': {
         description: 'ProductItem DELETE success',
       },
     },
   })
+  @authenticate('jwt')
   async deleteById(@param.path.number('id') id: number): Promise<void> {
     await this.productItemRepository.deleteById(id);
   }

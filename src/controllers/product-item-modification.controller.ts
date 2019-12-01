@@ -19,6 +19,8 @@ import {
 } from '@loopback/rest';
 import {ProductItemModification} from '../models';
 import {ProductItemModificationRepository} from '../repositories';
+import {authenticate} from "@loopback/authentication";
+import {OPERATION_SECURITY_SPEC} from "../utils/security-spec";
 
 export class ProductItemModificationController {
   constructor(
@@ -27,6 +29,7 @@ export class ProductItemModificationController {
   ) {}
 
   @post('/product-item-modifications', {
+    security: OPERATION_SECURITY_SPEC,
     responses: {
       '200': {
         description: 'ProductItemModification model instance',
@@ -34,6 +37,7 @@ export class ProductItemModificationController {
       },
     },
   })
+  @authenticate('jwt')
   async create(
     @requestBody({
       content: {
@@ -83,6 +87,7 @@ export class ProductItemModificationController {
   }
 
   @patch('/product-item-modifications', {
+    security: OPERATION_SECURITY_SPEC,
     responses: {
       '200': {
         description: 'ProductItemModification PATCH success count',
@@ -90,6 +95,7 @@ export class ProductItemModificationController {
       },
     },
   })
+  @authenticate('jwt')
   async updateAll(
     @requestBody({
       content: {
@@ -120,12 +126,14 @@ export class ProductItemModificationController {
   }
 
   @patch('/product-item-modifications/{id}', {
+    security: OPERATION_SECURITY_SPEC,
     responses: {
       '204': {
         description: 'ProductItemModification PATCH success',
       },
     },
   })
+  @authenticate('jwt')
   async updateById(
     @param.path.number('id') id: number,
     @requestBody({
@@ -141,12 +149,14 @@ export class ProductItemModificationController {
   }
 
   @put('/product-item-modifications/{id}', {
+    security: OPERATION_SECURITY_SPEC,
     responses: {
       '204': {
         description: 'ProductItemModification PUT success',
       },
     },
   })
+  @authenticate('jwt')
   async replaceById(
     @param.path.number('id') id: number,
     @requestBody() productItemModification: ProductItemModification,
@@ -155,12 +165,14 @@ export class ProductItemModificationController {
   }
 
   @del('/product-item-modifications/{id}', {
+    security: OPERATION_SECURITY_SPEC,
     responses: {
       '204': {
         description: 'ProductItemModification DELETE success',
       },
     },
   })
+  @authenticate('jwt')
   async deleteById(@param.path.number('id') id: number): Promise<void> {
     await this.productItemModificationRepository.deleteById(id);
   }

@@ -19,6 +19,8 @@ import {
 } from '@loopback/rest';
 import {ProductCategory} from '../models';
 import {ProductCategoryRepository} from '../repositories';
+import {authenticate} from "@loopback/authentication";
+import {OPERATION_SECURITY_SPEC} from "../utils/security-spec";
 
 export class ProductCategoryController {
   constructor(
@@ -27,6 +29,7 @@ export class ProductCategoryController {
   ) {}
 
   @post('/product-categories', {
+    security: OPERATION_SECURITY_SPEC,
     responses: {
       '200': {
         description: 'ProductCategory model instance',
@@ -34,6 +37,7 @@ export class ProductCategoryController {
       },
     },
   })
+  @authenticate('jwt')
   async create(
     @requestBody({
       content: {
@@ -83,6 +87,7 @@ export class ProductCategoryController {
   }
 
   @patch('/product-categories', {
+    security: OPERATION_SECURITY_SPEC,
     responses: {
       '200': {
         description: 'ProductCategory PATCH success count',
@@ -90,6 +95,7 @@ export class ProductCategoryController {
       },
     },
   })
+  @authenticate('jwt')
   async updateAll(
     @requestBody({
       content: {
@@ -117,12 +123,14 @@ export class ProductCategoryController {
   }
 
   @patch('/product-categories/{id}', {
+    security: OPERATION_SECURITY_SPEC,
     responses: {
       '204': {
         description: 'ProductCategory PATCH success',
       },
     },
   })
+  @authenticate('jwt')
   async updateById(
     @param.path.number('id') id: number,
     @requestBody({
@@ -138,12 +146,14 @@ export class ProductCategoryController {
   }
 
   @put('/product-categories/{id}', {
+    security: OPERATION_SECURITY_SPEC,
     responses: {
       '204': {
         description: 'ProductCategory PUT success',
       },
     },
   })
+  @authenticate('jwt')
   async replaceById(
     @param.path.number('id') id: number,
     @requestBody() productCategory: ProductCategory,
@@ -152,12 +162,14 @@ export class ProductCategoryController {
   }
 
   @del('/product-categories/{id}', {
+    security: OPERATION_SECURITY_SPEC,
     responses: {
       '204': {
         description: 'ProductCategory DELETE success',
       },
     },
   })
+  @authenticate('jwt')
   async deleteById(@param.path.number('id') id: number): Promise<void> {
     await this.productCategoryRepository.deleteById(id);
   }

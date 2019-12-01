@@ -19,6 +19,8 @@ import {
 } from '@loopback/rest';
 import {ProductTrend} from '../models';
 import {ProductTrendRepository} from '../repositories';
+import {authenticate} from "@loopback/authentication";
+import {OPERATION_SECURITY_SPEC} from "../utils/security-spec";
 
 export class ProductTrendController {
   constructor(
@@ -27,6 +29,7 @@ export class ProductTrendController {
   ) {}
 
   @post('/product-trends', {
+    security: OPERATION_SECURITY_SPEC,
     responses: {
       '200': {
         description: 'ProductTrend model instance',
@@ -34,6 +37,7 @@ export class ProductTrendController {
       },
     },
   })
+  @authenticate('jwt')
   async create(
     @requestBody({
       content: {
@@ -83,6 +87,7 @@ export class ProductTrendController {
   }
 
   @patch('/product-trends', {
+    security: OPERATION_SECURITY_SPEC,
     responses: {
       '200': {
         description: 'ProductTrend PATCH success count',
@@ -90,6 +95,7 @@ export class ProductTrendController {
       },
     },
   })
+  @authenticate('jwt')
   async updateAll(
     @requestBody({
       content: {
@@ -117,12 +123,14 @@ export class ProductTrendController {
   }
 
   @patch('/product-trends/{id}', {
+    security: OPERATION_SECURITY_SPEC,
     responses: {
       '204': {
         description: 'ProductTrend PATCH success',
       },
     },
   })
+  @authenticate('jwt')
   async updateById(
     @param.path.number('id') id: number,
     @requestBody({
@@ -138,12 +146,14 @@ export class ProductTrendController {
   }
 
   @put('/product-trends/{id}', {
+    security: OPERATION_SECURITY_SPEC,
     responses: {
       '204': {
         description: 'ProductTrend PUT success',
       },
     },
   })
+  @authenticate('jwt')
   async replaceById(
     @param.path.number('id') id: number,
     @requestBody() productTrend: ProductTrend,
@@ -152,12 +162,14 @@ export class ProductTrendController {
   }
 
   @del('/product-trends/{id}', {
+    security: OPERATION_SECURITY_SPEC,
     responses: {
       '204': {
         description: 'ProductTrend DELETE success',
       },
     },
   })
+  @authenticate('jwt')
   async deleteById(@param.path.number('id') id: number): Promise<void> {
     await this.productTrendRepository.deleteById(id);
   }
