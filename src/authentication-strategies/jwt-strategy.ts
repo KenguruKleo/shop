@@ -1,9 +1,9 @@
 import {inject} from '@loopback/context';
 import {HttpErrors, Request} from '@loopback/rest';
 import {AuthenticationStrategy, TokenService} from '@loopback/authentication';
-import {UserProfile} from '@loopback/security';
 
 import {TokenServiceBindings} from '../keys';
+import {MyUserProfile} from "../authorization";
 
 export class JWTAuthenticationStrategy implements AuthenticationStrategy {
 	name = 'jwt';
@@ -13,9 +13,9 @@ export class JWTAuthenticationStrategy implements AuthenticationStrategy {
 		public tokenService: TokenService,
 	) {}
 
-	async authenticate(request: Request): Promise<UserProfile | undefined> {
+	async authenticate(request: Request): Promise<MyUserProfile | undefined> {
 		const token: string = this.extractCredentials(request);
-		const userProfile: UserProfile = await this.tokenService.verifyToken(token);
+		const userProfile: MyUserProfile = await this.tokenService.verifyToken(token) as MyUserProfile;
 		return userProfile;
 	}
 

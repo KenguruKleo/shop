@@ -2,11 +2,12 @@ import {HttpErrors} from '@loopback/rest';
 import {UserRepository} from '../repositories';
 import {User, Credentials} from '../models';
 import {UserService} from '@loopback/authentication';
-import {UserProfile, securityId} from '@loopback/security';
+import {securityId} from '@loopback/security';
 import {repository} from '@loopback/repository';
 import {PasswordHasher} from './hash.password.bcryptjs';
 import {PasswordHasherBindings} from '../keys';
 import {inject} from '@loopback/context';
+import {MyUserProfile} from "../authorization";
 
 export class MyUserService implements UserService<User, Credentials> {
 	constructor(
@@ -37,7 +38,7 @@ export class MyUserService implements UserService<User, Credentials> {
 		return foundUser;
 	}
 
-	convertToUserProfile(user: User): UserProfile {
+	convertToUserProfile(user: User): MyUserProfile {
 		// since first name and lastName are optional, no error is thrown if not provided
 		let userName = '';
 		if (user.firstName) userName = `${user.firstName}`;
@@ -45,6 +46,10 @@ export class MyUserService implements UserService<User, Credentials> {
 			userName = user.firstName
 				? `${userName} ${user.lastName}`
 				: `${user.lastName}`;
-		return {[securityId]: user.id, name: userName};
+		return {
+			[securityId]: user.id,
+			name: userName,
+			permissions: user.permissions,
+		};
 	}
 }

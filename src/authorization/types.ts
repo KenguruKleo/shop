@@ -42,3 +42,4 @@ export interface UserPermissionsFn {
 		rolePermissions: PermissionKey[],
 	): PermissionKey[];
 }
+

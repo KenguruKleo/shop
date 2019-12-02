@@ -1,6 +1,5 @@
 import {BootMixin} from '@loopback/boot';
 import {ApplicationConfig, BindingKey} from '@loopback/core';
-import {inject} from "@loopback/context";
 import {
   RestExplorerBindings,
   RestExplorerComponent,

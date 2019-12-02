@@ -20,9 +20,10 @@ import {
   AuthorizationBindings,
   AuthorizeFn,
   UserPermissionsFn,
-  AuthorizeErrorKeys, PermissionKey,
+  AuthorizeErrorKeys,
+  PermissionKey,
+  MyUserProfile,
 } from './authorization';
-import { UserProfile } from '@loopback/security';
 
 const SequenceActions = RestBindings.SequenceActions;
 
@@ -50,23 +51,23 @@ export class MyAuthenticationSequence implements SequenceHandler {
       const route = this.findRoute(request);
 
       //call authentication action
-      const authUser: UserProfile | undefined = await this.authenticateRequest(request);
+      const authUser: MyUserProfile | undefined = await this.authenticateRequest(request) as MyUserProfile;
       console.log('authUser', authUser);
 
-      if (authUser) {
-        const permissions: PermissionKey[] = this.fetchUserPermissions(
-            authUser.permissions,
-            authUser.role.permissions,
-        );
-        // This is main line added to sequence
-        // where we are invoking the authorize action function to check for access
-        const isAccessAllowed: boolean = await this.checkAuthorization(
-            permissions,
-        );
-        if (!isAccessAllowed) {
-          throw new HttpErrors.Forbidden(AuthorizeErrorKeys.NotAllowedAccess);
-        }
-      }
+      // if (authUser) {
+      //   const permissions: PermissionKey[] = this.fetchUserPermissions(
+      //       authUser.permissions,
+      //       authUser.role.permissions,
+      //   );
+      //   // This is main line added to sequence
+      //   // where we are invoking the authorize action function to check for access
+      //   const isAccessAllowed: boolean = await this.checkAuthorization(
+      //       permissions,
+      //   );
+      //   if (!isAccessAllowed) {
+      //     throw new HttpErrors.Forbidden(AuthorizeErrorKeys.NotAllowedAccess);
+      //   }
+      // }
 
       // Authentication successful, proceed to invoke controller
       const args = await this.parseParams(request, route);

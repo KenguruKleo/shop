@@ -5,7 +5,7 @@ import {
   repository,
   Where,
 } from '@loopback/repository';
-import {UserProfile, securityId, SecurityBindings} from '@loopback/security';
+import {securityId, SecurityBindings} from '@loopback/security';
 import {
   post,
   param,
@@ -27,6 +27,7 @@ import {PasswordHasher} from "../services/hash.password.bcryptjs";
 import {authenticate, TokenService, UserService} from "@loopback/authentication";
 import {validateCredentials} from "../services/validator";
 import {OPERATION_SECURITY_SPEC} from "../utils/security-spec";
+import {MyUserProfile} from "../authorization";
 
 const uuidv1 = require('uuid/v1');
 
@@ -114,8 +115,8 @@ export class UserController {
     // ensure the user exists, and the password is correct
     const user = await this.userService.verifyCredentials(credentials);
 
-    // convert a User object into a UserProfile object (reduced set of properties)
-    const userProfile = this.userService.convertToUserProfile(user);
+    // convert a User object into a MyUserProfile object (reduced set of properties)
+    const userProfile = this.userService.convertToUserProfile(user) as MyUserProfile;
 
     // create a JSON Web Token based on the user profile
     const token = await this.jwtService.generateToken(userProfile);
@@ -134,7 +135,7 @@ export class UserController {
   })
   @authenticate('jwt')
   async printCurrentUser(
-      @inject(SecurityBindings.USER) currentUserProfile: UserProfile,
+      @inject(SecurityBindings.USER) currentUserProfile: MyUserProfile,
   ): Promise<UserWithoutCredentials> {
     return this.userWithoutCredentialsRepository.findById(currentUserProfile[securityId])
   }

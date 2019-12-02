@@ -1,13 +1,9 @@
-import { cloneDeep } from 'lodash';
-import {
-	Entity,
-	model,
-	MODEL_WITH_PROPERTIES_KEY,
-	property
-} from '@loopback/repository';
-import { MetadataInspector } from '@loopback/metadata';
+import {cloneDeep} from 'lodash';
+import {Entity, model, MODEL_WITH_PROPERTIES_KEY, property} from '@loopback/repository';
+import {MetadataInspector} from '@loopback/metadata';
 
 import {UserPermission} from "../authorization";
+import {UserProfile} from "@loopback/security";
 
 @model({
 	settings: {
@@ -78,3 +74,7 @@ export interface UserRelations {
 }
 
 export type UserWithRelations = User & UserRelations;
+
+export interface MyUserProfile extends UserProfile {
+	permissions: UserPermission[];
+}

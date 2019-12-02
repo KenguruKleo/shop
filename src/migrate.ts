@@ -26,7 +26,7 @@ export async function migrate(args: string[]) {
       permissions: [],
       firstName: 'admin',
       lastName: 'admin',
-      password: await (new BcryptHasher(10)).hashPassword('admin'),
+      password: await (new BcryptHasher(10)).hashPassword('adminadmin'),
       id: uuidv1()
     });
     const createdUser = await userRepo.create(newUser);

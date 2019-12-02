@@ -8,3 +8,4 @@ export * from './product-item-modification.controller';
 export * from './product-item-product-item-modification.controller';
 export * from './product-item-modification-product-item.controller';
 export * from './user.controller';
+export * from './role.controller';
