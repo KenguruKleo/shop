@@ -1,10 +1,11 @@
-import {User} from "./models";
+import {Role, User} from "./models";
 
 require('dotenv').config();
 
 import {ShopApplication} from './application';
 import {BcryptHasher} from "./services/hash.password.bcryptjs";
-import {UserRepository} from "./repositories";
+import {RoleRepository, UserRepository} from "./repositories";
+import {PermissionKey} from "./authorization";
 const uuidv1 = require('uuid/v1');
 
 export async function migrate(args: string[]) {
@@ -17,12 +18,51 @@ export async function migrate(args: string[]) {
   await app.migrateSchema({ existingSchema, models: [ 'Role'] });
   await app.migrateSchema({ existingSchema, models: [ 'User'] });
 
+  // create default roles
+  const roleRepo = await app.getRepository(RoleRepository);
+
+  let adminRole = new Role({
+    id: "admin",
+    permissions: [
+      PermissionKey.ViewOwnUser,
+      PermissionKey.ViewAnyUser,
+      PermissionKey.CreateAnyUser,
+      PermissionKey.UpdateOwnUser,
+      PermissionKey.UpdateAnyUser,
+      PermissionKey.DeleteAnyUser,
+      PermissionKey.ViewRoles,
+      PermissionKey.CreateRoles,
+      PermissionKey.UpdateRoles,
+      PermissionKey.DeleteRoles,
+    ]
+  });
+  try {
+    adminRole = await roleRepo.findById('admin');
+  } catch(e) {
+    await roleRepo.create(adminRole);
+  }
+
+  try {
+    await roleRepo.findById('guest');
+  } catch {
+    const guestRole = new Role({
+      id: "guest",
+      permissions: [
+        PermissionKey.ViewOwnUser,
+        PermissionKey.UpdateOwnUser,
+      ]
+    });
+    await roleRepo.create(guestRole);
+  }
+
   // create first default admin if it not exist yet
   const userRepo = await app.getRepository(UserRepository);
-  const { count } = await userRepo.count();
-  if (count === 0) {
+  const { count: countUsers } = await userRepo.count();
+
+  if (countUsers === 0) {
     const newUser: User = new User({
       email: "admin@admin.com",
+      role: 'admin',
       permissions: [],
       firstName: 'admin',
       lastName: 'admin',

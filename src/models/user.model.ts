@@ -4,6 +4,7 @@ import {MetadataInspector} from '@loopback/metadata';
 
 import {UserPermission} from "../authorization";
 import {UserProfile} from "@loopback/security";
+import {Role} from "./role.model";
 
 @model({
 	settings: {
@@ -52,6 +53,12 @@ export class User extends Entity {
 	@property.array(String)
 	permissions: UserPermission[];
 
+	@property({
+		type: 'string',
+		default: 'guest',
+	})
+	role: string;
+
 	constructor(data?: Partial<User>) {
 		super(data);
 	}
@@ -59,6 +66,8 @@ export class User extends Entity {
 
 const userDefinition = cloneDeep(User.definition);
 delete userDefinition.properties['password'];
+delete userDefinition.properties['permissions'];
+delete userDefinition.properties['role'];
 
 @model(userDefinition)
 export class UserWithoutCredentials extends Entity {
