@@ -40,12 +40,12 @@ export class RoleController {
         'application/json': {
           schema: getModelSchemaRef(Role, {
             title: 'NewRole',
-            exclude: ['id'],
+            
           }),
         },
       },
     })
-    role: Omit<Role, 'id'>,
+    role: Role,
   ): Promise<Role> {
     return this.roleRepository.create(role);
   }
@@ -112,7 +112,7 @@ export class RoleController {
       },
     },
   })
-  async findById(@param.path.number('id') id: number): Promise<Role> {
+  async findById(@param.path.string('id') id: string): Promise<Role> {
     return this.roleRepository.findById(id);
   }
 
@@ -124,7 +124,7 @@ export class RoleController {
     },
   })
   async updateById(
-    @param.path.number('id') id: number,
+    @param.path.string('id') id: string,
     @requestBody({
       content: {
         'application/json': {
@@ -145,7 +145,7 @@ export class RoleController {
     },
   })
   async replaceById(
-    @param.path.number('id') id: number,
+    @param.path.string('id') id: string,
     @requestBody() role: Role,
   ): Promise<void> {
     await this.roleRepository.replaceById(id, role);
@@ -158,7 +158,7 @@ export class RoleController {
       },
     },
   })
-  async deleteById(@param.path.number('id') id: number): Promise<void> {
+  async deleteById(@param.path.string('id') id: string): Promise<void> {
     await this.roleRepository.deleteById(id);
   }
 }

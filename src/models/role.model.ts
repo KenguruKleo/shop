@@ -4,11 +4,11 @@ import {PermissionKey} from "../authorization";
 @model()
 export class Role extends Entity {
   @property({
-    type: 'number',
+    type: 'string',
+    required: true,
     id: true,
-    generated: true,
   })
-  id?: number;
+  id: string;
 
   @property({
     type: 'array',
@@ -16,7 +16,6 @@ export class Role extends Entity {
     required: true,
   })
   permissions: PermissionKey[];
-
 
   constructor(data?: Partial<Role>) {
     super(data);
