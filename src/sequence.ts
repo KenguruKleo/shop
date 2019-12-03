@@ -52,22 +52,23 @@ export class MyAuthenticationSequence implements SequenceHandler {
 
       //call authentication action
       const authUser: MyUserProfile | undefined = await this.authenticateRequest(request) as MyUserProfile;
-      console.log('authUser', authUser);
+      //console.log('authUser', authUser);
 
-      // if (authUser) {
-      //   const permissions: PermissionKey[] = this.fetchUserPermissions(
-      //       authUser.permissions,
-      //       authUser.role.permissions,
-      //   );
-      //   // This is main line added to sequence
-      //   // where we are invoking the authorize action function to check for access
-      //   const isAccessAllowed: boolean = await this.checkAuthorization(
-      //       permissions,
-      //   );
-      //   if (!isAccessAllowed) {
-      //     throw new HttpErrors.Forbidden(AuthorizeErrorKeys.NotAllowedAccess);
-      //   }
-      // }
+      if (authUser) {
+        const permissions: PermissionKey[] = this.fetchUserPermissions(
+            authUser.permissions,
+            authUser.role.permissions,
+        );
+        // This is main line added to sequence
+        // where we are invoking the authorize action function to check for access
+        const isAccessAllowed: boolean = await this.checkAuthorization(
+            permissions,
+        );
+        console.log('permissions', permissions);
+        if (!isAccessAllowed) {
+          throw new HttpErrors.Forbidden(AuthorizeErrorKeys.NotAllowedAccess);
+        }
+      }
 
       // Authentication successful, proceed to invoke controller
       const args = await this.parseParams(request, route);

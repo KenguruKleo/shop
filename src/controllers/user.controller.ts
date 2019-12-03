@@ -28,6 +28,7 @@ import {authenticate, TokenService, UserService} from "@loopback/authentication"
 import {validateCredentials} from "../services/validator";
 import {OPERATION_SECURITY_SPEC} from "../utils/security-spec";
 import {MyUserProfile} from "../models";
+import {authorize, PermissionKey} from "../authorization";
 
 const uuidv1 = require('uuid/v1');
 
@@ -53,6 +54,7 @@ export class UserController {
     },
   })
   @authenticate('jwt')
+  @authorize([PermissionKey.CreateAnyUser])
   async create(
     @requestBody({
       content: {
@@ -134,6 +136,7 @@ export class UserController {
     },
   })
   @authenticate('jwt')
+  @authorize([PermissionKey.ViewOwnUser])
   async printCurrentUser(
       @inject(SecurityBindings.USER) currentUserProfile: MyUserProfile,
   ): Promise<UserWithoutCredentials> {
@@ -150,6 +153,7 @@ export class UserController {
     },
   })
   @authenticate('jwt')
+  @authorize([PermissionKey.ViewAnyUser])
   async count(
     @param.query.object('where', getWhereSchemaFor(UserWithoutCredentials)) where?: Where<UserWithoutCredentials>,
   ): Promise<Count> {
@@ -166,6 +170,7 @@ export class UserController {
     },
   })
   @authenticate('jwt')
+  @authorize([PermissionKey.ViewAnyUser])
   async find(
     @param.query.object('filter', getFilterSchemaFor(UserWithoutCredentials)) filter?: Filter<UserWithoutCredentials>,
   ): Promise<UserWithoutCredentials[]> {
@@ -182,6 +187,7 @@ export class UserController {
     },
   })
   @authenticate('jwt')
+  @authorize([PermissionKey.UpdateAnyUser])
   async updateAll(
     @requestBody({
       content: {
@@ -206,6 +212,7 @@ export class UserController {
     },
   })
   @authenticate('jwt')
+  @authorize([PermissionKey.ViewAnyUser])
   async findById(@param.path.string('id') id: string): Promise<UserWithoutCredentials> {
     return this.userWithoutCredentialsRepository.findById(id);
   }
@@ -219,6 +226,7 @@ export class UserController {
     },
   })
   @authenticate('jwt')
+  @authorize([PermissionKey.UpdateAnyUser])
   async updateById(
     @param.path.string('id') id: string,
     @requestBody({
@@ -242,6 +250,7 @@ export class UserController {
     },
   })
   @authenticate('jwt')
+  @authorize([PermissionKey.UpdateAnyUser])
   async replaceById(
     @param.path.string('id') id: string,
     @requestBody() user: UserWithoutCredentials,
@@ -258,6 +267,7 @@ export class UserController {
     },
   })
   @authenticate('jwt')
+  @authorize([PermissionKey.DeleteAnyUser])
   async deleteById(@param.path.string('id') id: string): Promise<void> {
     await this.userWithoutCredentialsRepository.deleteById(id);
   }
