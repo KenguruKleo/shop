@@ -22,8 +22,8 @@ import {
   UserPermissionsFn,
   AuthorizeErrorKeys,
   PermissionKey,
-  MyUserProfile,
 } from './authorization';
+import {MyUserProfile} from "./models";
 
 const SequenceActions = RestBindings.SequenceActions;
 

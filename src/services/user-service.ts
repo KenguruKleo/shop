@@ -1,24 +1,28 @@
 import {HttpErrors} from '@loopback/rest';
-import {UserRepository} from '../repositories';
-import {User, Credentials} from '../models';
+import {RoleRepository, UserRepository} from '../repositories';
+import {User, Credentials, UserWithRelations} from '../models';
 import {UserService} from '@loopback/authentication';
 import {securityId} from '@loopback/security';
 import {repository} from '@loopback/repository';
 import {PasswordHasher} from './hash.password.bcryptjs';
 import {PasswordHasherBindings} from '../keys';
 import {inject} from '@loopback/context';
-import {MyUserProfile} from "../authorization";
+import {MyUserProfile} from "../models";
 
 export class MyUserService implements UserService<User, Credentials> {
 	constructor(
 		@repository(UserRepository) public userRepository: UserRepository,
+		@repository(RoleRepository) public roleRepository: RoleRepository,
 		@inject(PasswordHasherBindings.PASSWORD_HASHER)
 		public passwordHasher: PasswordHasher,
 	) {}
 
-	async verifyCredentials(credentials: Credentials): Promise<User> {
+	async verifyCredentials(credentials: Credentials): Promise<UserWithRelations> {
 		const foundUser = await this.userRepository.findOne({
 			where: {email: credentials.email},
+			include: [
+				{relation: 'role'}
+			]
 		});
 
 		if (!foundUser) {
@@ -38,7 +42,8 @@ export class MyUserService implements UserService<User, Credentials> {
 		return foundUser;
 	}
 
-	convertToUserProfile(user: User): MyUserProfile {
+	convertToUserProfile(user: UserWithRelations): MyUserProfile {
+		console.log('convertToUserProfile', user);
 		// since first name and lastName are optional, no error is thrown if not provided
 		let userName = '';
 		if (user.firstName) userName = `${user.firstName}`;
@@ -50,6 +55,7 @@ export class MyUserService implements UserService<User, Credentials> {
 			[securityId]: user.id,
 			name: userName,
 			permissions: user.permissions,
+			role: user.role,
 		};
 	}
 }

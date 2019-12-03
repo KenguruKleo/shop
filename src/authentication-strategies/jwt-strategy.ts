@@ -3,7 +3,7 @@ import {HttpErrors, Request} from '@loopback/rest';
 import {AuthenticationStrategy, TokenService} from '@loopback/authentication';
 
 import {TokenServiceBindings} from '../keys';
-import {MyUserProfile} from "../authorization";
+import {MyUserProfile} from "../models";
 
 export class JWTAuthenticationStrategy implements AuthenticationStrategy {
 	name = 'jwt';

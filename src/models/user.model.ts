@@ -1,5 +1,5 @@
 import {cloneDeep} from 'lodash';
-import {Entity, model, MODEL_WITH_PROPERTIES_KEY, property} from '@loopback/repository';
+import {belongsTo, Entity, model, MODEL_WITH_PROPERTIES_KEY, property} from '@loopback/repository';
 import {MetadataInspector} from '@loopback/metadata';
 
 import {UserPermission} from "../authorization";
@@ -53,11 +53,12 @@ export class User extends Entity {
 	@property.array(String)
 	permissions: UserPermission[];
 
-	@property({
-		type: 'string',
-		default: 'guest',
-	})
-	role: string;
+	// @property({
+	// 	type: 'string',
+	// 	default: 'guest',
+	// })
+	@belongsTo(() => Role, {name: 'role'})
+	roleName: string;
 
 	constructor(data?: Partial<User>) {
 		super(data);
@@ -67,7 +68,7 @@ export class User extends Entity {
 const userDefinition = cloneDeep(User.definition);
 delete userDefinition.properties['password'];
 delete userDefinition.properties['permissions'];
-delete userDefinition.properties['role'];
+delete userDefinition.properties['roleName'];
 
 @model(userDefinition)
 export class UserWithoutCredentials extends Entity {
@@ -80,10 +81,12 @@ MetadataInspector.defineMetadata(MODEL_WITH_PROPERTIES_KEY.key, userDefinition, 
 
 export interface UserRelations {
 	// describe navigational properties here
+	role: Role;
 }
 
 export type UserWithRelations = User & UserRelations;
 
 export interface MyUserProfile extends UserProfile {
 	permissions: UserPermission[];
+	role: Role;
 }

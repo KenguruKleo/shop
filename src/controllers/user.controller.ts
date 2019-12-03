@@ -27,7 +27,7 @@ import {PasswordHasher} from "../services/hash.password.bcryptjs";
 import {authenticate, TokenService, UserService} from "@loopback/authentication";
 import {validateCredentials} from "../services/validator";
 import {OPERATION_SECURITY_SPEC} from "../utils/security-spec";
-import {MyUserProfile} from "../authorization";
+import {MyUserProfile} from "../models";
 
 const uuidv1 = require('uuid/v1');
 

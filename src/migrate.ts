@@ -62,7 +62,7 @@ export async function migrate(args: string[]) {
   if (countUsers === 0) {
     const newUser: User = new User({
       email: "admin@admin.com",
-      role: 'admin',
+      roleName: 'admin',
       permissions: [],
       firstName: 'admin',
       lastName: 'admin',

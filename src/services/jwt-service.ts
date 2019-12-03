@@ -4,7 +4,7 @@ import {promisify} from 'util';
 import {TokenService} from '@loopback/authentication';
 import {securityId} from '@loopback/security';
 import {TokenServiceBindings} from '../keys';
-import {MyUserProfile} from "../authorization";
+import {MyUserProfile} from "../models";
 
 const jwt = require('jsonwebtoken');
 const signAsync = promisify(jwt.sign);
@@ -37,12 +37,14 @@ export class JWTService implements TokenService {
 					name: '',
 					id: '',
 					permissions: [],
+					role: { permissions: [] }
 				},
 				{
 					[securityId]: decodedToken.id,
 					name: decodedToken.name,
 					id: decodedToken.id,
 					permissions: decodedToken.permissions,
+					role: JSON.parse(decodedToken.role),
 				},
 			);
 		} catch (error) {
@@ -64,6 +66,7 @@ export class JWTService implements TokenService {
 			name: userProfile.name,
 			email: userProfile.email,
 			permissions: userProfile.permissions,
+			role: JSON.stringify(userProfile.role),
 		};
 		// Generate a JSON Web Token
 		let token: string;
