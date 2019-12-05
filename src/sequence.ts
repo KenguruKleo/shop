@@ -29,18 +29,27 @@ const SequenceActions = RestBindings.SequenceActions;
 
 export class MyAuthenticationSequence implements SequenceHandler {
   constructor(
-      @inject(SequenceActions.FIND_ROUTE) protected findRoute: FindRoute,
+      @inject(SequenceActions.FIND_ROUTE)
+      protected findRoute: FindRoute,
+
       @inject(SequenceActions.PARSE_PARAMS)
       protected parseParams: ParseParams,
-      @inject(SequenceActions.INVOKE_METHOD) protected invoke: InvokeMethod,
-      @inject(SequenceActions.SEND) protected send: Send,
-      @inject(SequenceActions.REJECT) protected reject: Reject,
+
+      @inject(SequenceActions.INVOKE_METHOD)
+      protected invoke: InvokeMethod,
+
+      @inject(SequenceActions.SEND)
+      protected send: Send,
+
+      @inject(SequenceActions.REJECT)
+      protected reject: Reject,
 
       @inject(AuthenticationBindings.AUTH_ACTION)
       protected authenticateRequest: AuthenticateFn,
 
       @inject(AuthorizationBindings.USER_PERMISSIONS)
       protected fetchUserPermissions: UserPermissionsFn,
+
       @inject(AuthorizationBindings.AUTHORIZE_ACTION)
       protected checkAuthorization: AuthorizeFn,
   ) {}
@@ -52,22 +61,18 @@ export class MyAuthenticationSequence implements SequenceHandler {
 
       //call authentication action
       const authUser: MyUserProfile | undefined = await this.authenticateRequest(request) as MyUserProfile;
-      //console.log('authUser', authUser);
 
-      if (authUser) {
-        const permissions: PermissionKey[] = this.fetchUserPermissions(
-            authUser.permissions,
-            authUser.role.permissions,
-        );
-        // This is main line added to sequence
-        // where we are invoking the authorize action function to check for access
-        const isAccessAllowed: boolean = await this.checkAuthorization(
-            permissions,
-        );
-        console.log('permissions', permissions);
-        if (!isAccessAllowed) {
-          throw new HttpErrors.Forbidden(AuthorizeErrorKeys.NotAllowedAccess);
-        }
+      const permissions: PermissionKey[] = this.fetchUserPermissions(
+          authUser ? authUser.permissions : [],
+          authUser ? authUser.role.permissions : [],
+      );
+      // This is main line added to sequence
+      // where we are invoking the authorize action function to check for access
+      const isAccessAllowed: boolean = await this.checkAuthorization(
+          permissions,
+      );
+      if (!isAccessAllowed) {
+        throw new HttpErrors.Forbidden(AuthorizeErrorKeys.NotAllowedAccess);
       }
 
       // Authentication successful, proceed to invoke controller

@@ -23,18 +23,7 @@ export async function migrate(args: string[]) {
 
   let adminRole = new Role({
     id: "admin",
-    permissions: [
-      PermissionKey.ViewOwnUser,
-      PermissionKey.ViewAnyUser,
-      PermissionKey.CreateAnyUser,
-      PermissionKey.UpdateOwnUser,
-      PermissionKey.UpdateAnyUser,
-      PermissionKey.DeleteAnyUser,
-      PermissionKey.ViewRoles,
-      PermissionKey.CreateRoles,
-      PermissionKey.UpdateRoles,
-      PermissionKey.DeleteRoles,
-    ]
+    permissions: Object.values(PermissionKey), // allow all permissions
   });
   try {
     adminRole = await roleRepo.findById('admin');

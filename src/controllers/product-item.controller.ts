@@ -21,6 +21,7 @@ import {ProductItem} from '../models';
 import {ProductItemRepository} from '../repositories';
 import {authenticate} from "@loopback/authentication";
 import {OPERATION_SECURITY_SPEC} from "../utils/security-spec";
+import {authorize} from "../authorization";
 
 export class ProductItemController {
   constructor(
@@ -80,6 +81,7 @@ export class ProductItemController {
       },
     },
   })
+  @authorize(['*'])
   async find(
     @param.query.object('filter', getFilterSchemaFor(ProductItem)) filter?: Filter<ProductItem>,
   ): Promise<ProductItem[]> {

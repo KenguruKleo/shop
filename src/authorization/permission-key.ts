@@ -1,4 +1,4 @@
-export const enum PermissionKey {
+export enum PermissionKey {
 	// For accessing own (logged in user) profile
 	ViewOwnUser = 'ViewOwnUser',
 	// For accessing other users profile.
