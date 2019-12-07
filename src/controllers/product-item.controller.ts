@@ -24,6 +24,7 @@ import {OPERATION_SECURITY_SPEC} from "../utils/security-spec";
 import {authorize} from "../authorization";
 
 export class ProductItemController {
+
   constructor(
     @repository(ProductItemRepository)
     public productItemRepository : ProductItemRepository,
