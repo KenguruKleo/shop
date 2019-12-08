@@ -1,4 +1,5 @@
-import {Entity, model, property} from '@loopback/repository';
+import {Entity, model, property, belongsTo} from '@loopback/repository';
+import {Category} from './category.model';
 
 @model()
 export class Product extends Entity {
@@ -19,6 +20,8 @@ export class Product extends Entity {
   })
   description?: string;
 
+  @belongsTo(() => Category)
+  categoryId: number;
 
   constructor(data?: Partial<Product>) {
     super(data);

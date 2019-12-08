@@ -23,4 +23,5 @@ export enum PermissionKey {
 
 	// For Products
 	ManageProducts = 'ManageProducts',
+	ManageCategories = 'ManageCategories',
 }

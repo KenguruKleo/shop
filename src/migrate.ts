@@ -76,6 +76,7 @@ export async function migrate(args: string[]) {
   // const savedUser = <UserWithoutCredentials>await this.userRepository.create(newUser);
 
   await app.migrateSchema({ existingSchema, models: [ 'Product'] });
+  await app.migrateSchema({ existingSchema, models: [ 'Category'] });
 
   // Connectors usually keep a pool of opened connections,
   // this keeps the process running even after all work is done.

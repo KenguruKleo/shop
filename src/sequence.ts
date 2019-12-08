@@ -62,22 +62,21 @@ export class MyAuthenticationSequence implements SequenceHandler {
       //call authentication action
       const authUser: MyUserProfile | undefined = await this.authenticateRequest(request) as MyUserProfile;
 
-      const permissions: PermissionKey[] = this.fetchUserPermissions(
-          authUser ? authUser.permissions : [],
-          authUser ? authUser.role.permissions : [],
-      );
-      // This is main line added to sequence
-      // where we are invoking the authorize action function to check for access
-      const isAccessAllowed: boolean = await this.checkAuthorization(
-          permissions,
-      );
       // allow some paths, we can do it in controller by adding ['*'], but it is a internal framework path
       const allowedPaths = [
-          /^\/explorer.*/,
+        /^\/explorer.*/,
       ];
-
-      if (!isAccessAllowed && !allowedPaths.find(path => path.test(route.path))) {
-        throw new HttpErrors.Forbidden(AuthorizeErrorKeys.NotAllowedAccess);
+      if (!allowedPaths.find(path => path.test(route.path))) {
+        const permissions: PermissionKey[] = this.fetchUserPermissions(
+            authUser ? authUser.permissions : [],
+            authUser ? authUser.role.permissions : [],
+        );
+        const isAccessAllowed: boolean = await this.checkAuthorization(
+            permissions,
+        );
+        if (!isAccessAllowed) {
+          throw new HttpErrors.Forbidden(AuthorizeErrorKeys.NotAllowedAccess);
+        }
       }
 
       // Authentication successful, proceed to invoke controller
