@@ -74,6 +74,7 @@ export async function migrate(args: string[]) {
 
   await app.migrateSchema({ existingSchema, models: [ 'Product'] });
   await app.migrateSchema({ existingSchema, models: [ 'Category'] });
+  await app.migrateSchema({ existingSchema, models: [ 'Feature'] });
 
   // Connectors usually keep a pool of opened connections,
   // this keeps the process running even after all work is done.
