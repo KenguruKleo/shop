@@ -19,6 +19,8 @@ import {
 } from '@loopback/rest';
 import {Feature} from '../models';
 import {FeatureRepository} from '../repositories';
+import {authenticate} from "@loopback/authentication";
+import {authorize, PermissionKey} from "../authorization";
 
 export class FeatureController {
   constructor(
@@ -26,6 +28,8 @@ export class FeatureController {
     public featureRepository : FeatureRepository,
   ) {}
 
+  @authenticate('jwt')
+  @authorize([PermissionKey.ManageFeatures])
   @post('/features', {
     responses: {
       '200': {
@@ -50,6 +54,7 @@ export class FeatureController {
     return this.featureRepository.create(feature);
   }
 
+  @authorize(['*'])
   @get('/features/count', {
     responses: {
       '200': {
@@ -64,6 +69,7 @@ export class FeatureController {
     return this.featureRepository.count(where);
   }
 
+  @authorize(['*'])
   @get('/features', {
     responses: {
       '200': {
@@ -82,6 +88,8 @@ export class FeatureController {
     return this.featureRepository.find(filter);
   }
 
+  @authenticate('jwt')
+  @authorize([PermissionKey.ManageFeatures])
   @patch('/features', {
     responses: {
       '200': {
@@ -104,6 +112,7 @@ export class FeatureController {
     return this.featureRepository.updateAll(feature, where);
   }
 
+  @authorize(['*'])
   @get('/features/{id}', {
     responses: {
       '200': {
@@ -116,6 +125,8 @@ export class FeatureController {
     return this.featureRepository.findById(id);
   }
 
+  @authenticate('jwt')
+  @authorize([PermissionKey.ManageFeatures])
   @patch('/features/{id}', {
     responses: {
       '204': {
@@ -137,6 +148,8 @@ export class FeatureController {
     await this.featureRepository.updateById(id, feature);
   }
 
+  @authenticate('jwt')
+  @authorize([PermissionKey.ManageFeatures])
   @put('/features/{id}', {
     responses: {
       '204': {
@@ -151,6 +164,8 @@ export class FeatureController {
     await this.featureRepository.replaceById(id, feature);
   }
 
+  @authenticate('jwt')
+  @authorize([PermissionKey.ManageFeatures])
   @del('/features/{id}', {
     responses: {
       '204': {
