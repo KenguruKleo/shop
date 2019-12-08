@@ -3,7 +3,6 @@ import {belongsTo, Entity, model, MODEL_WITH_PROPERTIES_KEY, property} from '@lo
 import {MetadataInspector} from '@loopback/metadata';
 
 import {UserPermission} from "../authorization";
-import {UserProfile} from "@loopback/security";
 import {Role} from "./role.model";
 
 @model({
@@ -53,10 +52,6 @@ export class User extends Entity {
 	@property.array(String)
 	permissions: UserPermission[];
 
-	// @property({
-	// 	type: 'string',
-	// 	default: 'guest',
-	// })
 	@belongsTo(() => Role, {name: 'role'})
 	roleName: string;
 
@@ -86,7 +81,3 @@ export interface UserRelations {
 
 export type UserWithRelations = User & UserRelations;
 
-export interface MyUserProfile extends UserProfile {
-	permissions: UserPermission[];
-	role: Role;
-}

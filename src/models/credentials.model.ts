@@ -1,4 +1,7 @@
 import {Model, model, property} from '@loopback/repository';
+import {UserProfile} from "@loopback/security";
+import {UserPermission} from "../authorization";
+import {Role} from "./role.model";
 
 @model()
 export class Credentials extends Model {
@@ -31,3 +34,8 @@ export interface CredentialsRelations {
 }
 
 export type CredentialsWithRelations = Credentials & CredentialsRelations;
+
+export interface MyUserProfile extends UserProfile {
+  permissions: UserPermission[];
+  role: Role;
+}
