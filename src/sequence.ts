@@ -77,7 +77,7 @@ export class MyAuthenticationSequence implements SequenceHandler {
       ];
 
       if (!isAccessAllowed && !allowedPaths.find(path => path.test(route.path))) {
-        //throw new HttpErrors.Forbidden(AuthorizeErrorKeys.NotAllowedAccess);
+        throw new HttpErrors.Forbidden(AuthorizeErrorKeys.NotAllowedAccess);
       }
 
       // Authentication successful, proceed to invoke controller

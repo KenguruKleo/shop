@@ -20,4 +20,7 @@ export enum PermissionKey {
 	UpdateRoles = 'UpdateRoles',
 	// For removing a role
 	DeleteRoles = 'DeleteRoles',
+
+	// For Products
+	ManageProducts = 'ManageProducts',
 }

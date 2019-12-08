@@ -6,7 +6,7 @@ import {ShopApplication} from './application';
 import {BcryptHasher} from "./services/hash.password.bcryptjs";
 import {RoleRepository, UserRepository} from "./repositories";
 import {PermissionKey} from "./authorization";
-const uuidv1 = require('uuid/v1');
+import {v1 as uuid} from 'uuid';
 
 export async function migrate(args: string[]) {
   const existingSchema = args.includes('--rebuild') ? 'drop' : 'alter';
@@ -27,13 +27,22 @@ export async function migrate(args: string[]) {
   });
   try {
     adminRole = await roleRepo.findById('admin');
+    // if some permission is absent - update role
+    if (Object.values(PermissionKey).some(permission => adminRole.permissions.indexOf(permission) === -1)) {
+      adminRole.permissions = Object.values(PermissionKey);
+      await roleRepo.save(adminRole);
+      console.log('update permissions for admin role');
+    }
   } catch(e) {
+    // if not found - create
     await roleRepo.create(adminRole);
+    console.log('create admin role');
   }
 
   try {
     await roleRepo.findById('guest');
   } catch {
+    // if not found - create
     const guestRole = new Role({
       id: "guest",
       permissions: [
@@ -42,6 +51,7 @@ export async function migrate(args: string[]) {
       ]
     });
     await roleRepo.create(guestRole);
+    console.log('create guest role');
   }
 
   // create first default admin if it not exist yet
@@ -56,7 +66,7 @@ export async function migrate(args: string[]) {
       firstName: 'admin',
       lastName: 'admin',
       password: await (new BcryptHasher(10)).hashPassword('adminadmin'),
-      id: uuidv1()
+      id: uuid()
     });
     const createdUser = await userRepo.create(newUser);
     console.log('Created default admin', createdUser);
@@ -65,10 +75,7 @@ export async function migrate(args: string[]) {
   // // create the new user and remove credential info from result
   // const savedUser = <UserWithoutCredentials>await this.userRepository.create(newUser);
 
-  // await app.migrateSchema({ existingSchema, models: [ 'ProductCategory'] });
-  // await app.migrateSchema({ existingSchema, models: [ 'ProductTrend'] });
-  // await app.migrateSchema({ existingSchema, models: [ 'ProductItem'] });
-  // await app.migrateSchema({ existingSchema, models: [ 'ProductItemModification'] });
+  await app.migrateSchema({ existingSchema, models: [ 'Product'] });
 
   // Connectors usually keep a pool of opened connections,
   // this keeps the process running even after all work is done.

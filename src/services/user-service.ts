@@ -43,7 +43,6 @@ export class MyUserService implements UserService<User, Credentials> {
 	}
 
 	convertToUserProfile(user: UserWithRelations): MyUserProfile {
-		console.log('convertToUserProfile', user);
 		// since first name and lastName are optional, no error is thrown if not provided
 		let userName = '';
 		if (user.firstName) userName = `${user.firstName}`;
