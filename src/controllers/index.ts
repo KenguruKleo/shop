@@ -4,3 +4,4 @@ export * from './role.controller';
 export * from './product.controller';
 export * from './category.controller';
 export * from './product-category.controller';
+export * from './category-product.controller';

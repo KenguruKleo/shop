@@ -1,4 +1,5 @@
-import {Entity, model, property} from '@loopback/repository';
+import {Entity, model, property, hasMany} from '@loopback/repository';
+import {Product} from './product.model';
 
 @model()
 export class Category extends Entity {
@@ -15,6 +16,8 @@ export class Category extends Entity {
   })
   name: string;
 
+  @hasMany(() => Product)
+  products: Product[];
 
   constructor(data?: Partial<Category>) {
     super(data);

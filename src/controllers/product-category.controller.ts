@@ -11,6 +11,7 @@ import {
   Category,
 } from '../models';
 import {ProductRepository} from '../repositories';
+import {authorize} from "../authorization";
 
 export class ProductCategoryController {
   constructor(
@@ -18,6 +19,7 @@ export class ProductCategoryController {
     public productRepository: ProductRepository,
   ) { }
 
+  @authorize(['*'])
   @get('/products/{id}/category', {
     responses: {
       '200': {

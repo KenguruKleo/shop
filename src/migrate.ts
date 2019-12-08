@@ -72,9 +72,6 @@ export async function migrate(args: string[]) {
     console.log('Created default admin', createdUser);
   }
 
-  // // create the new user and remove credential info from result
-  // const savedUser = <UserWithoutCredentials>await this.userRepository.create(newUser);
-
   await app.migrateSchema({ existingSchema, models: [ 'Product'] });
   await app.migrateSchema({ existingSchema, models: [ 'Category'] });
 
