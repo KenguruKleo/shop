@@ -71,8 +71,13 @@ export class MyAuthenticationSequence implements SequenceHandler {
       const isAccessAllowed: boolean = await this.checkAuthorization(
           permissions,
       );
-      if (!isAccessAllowed) {
-        throw new HttpErrors.Forbidden(AuthorizeErrorKeys.NotAllowedAccess);
+      // allow some paths, we can do it in controller by adding ['*'], but it is a internal framework path
+      const allowedPaths = [
+          /^\/explorer.*/,
+      ];
+
+      if (!isAccessAllowed && !allowedPaths.find(path => path.test(route.path))) {
+        //throw new HttpErrors.Forbidden(AuthorizeErrorKeys.NotAllowedAccess);
       }
 
       // Authentication successful, proceed to invoke controller

@@ -19,6 +19,8 @@ export class AuthorizationMetadataProvider
 	) {}
 
 	value(): AuthorizationMetadata | undefined {
+		console.log('this.controllerClass', this.controllerClass);
+		console.log('this.methodName', this.methodName);
 		return getAuthorizeMetadata(this.controllerClass, this.methodName);
 	}
 }
@@ -27,6 +29,8 @@ export function getAuthorizeMetadata(
 	controllerClass: Constructor<{}>,
 	methodName: string,
 ): AuthorizationMetadata | undefined {
+	console.log('controllerClass.prototype', controllerClass.prototype);
+	console.log('methodName', methodName);
 	return MetadataInspector.getMethodMetadata<AuthorizationMetadata>(
 		AUTHORIZATION_METADATA_ACCESSOR,
 		controllerClass.prototype,
