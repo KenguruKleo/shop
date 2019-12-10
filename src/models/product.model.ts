@@ -1,5 +1,6 @@
-import {Entity, model, property, belongsTo} from '@loopback/repository';
-import {Category, CategoryRelations} from './category.model';
+import {Entity, model, property, belongsTo, hasMany} from '@loopback/repository';
+import {Category, CategoryWithRelations} from './category.model';
+import {Feature, FeatureWithRelations} from "./feature.model";
 
 @model()
 export class Product extends Entity {
@@ -21,7 +22,16 @@ export class Product extends Entity {
   description?: string;
 
   @belongsTo(() => Category)
-  categoryId: number;
+  categoryId?: number;
+
+  @property({
+    type: 'array',
+    itemType: 'number',
+  })
+  featureIds?: Array<number>;
+
+  @hasMany(() => Feature, {name: 'features'})
+  features?: Feature[];
 
   constructor(data?: Partial<Product>) {
     super(data);
@@ -29,7 +39,8 @@ export class Product extends Entity {
 }
 
 export interface ProductRelations {
-  categories?: CategoryRelations;
+  categories?: CategoryWithRelations;
+  //features?: FeatureWithRelations[];
 }
 
 export type ProductWithRelations = Product & ProductRelations;

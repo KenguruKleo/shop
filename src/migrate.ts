@@ -1,10 +1,10 @@
-import {Role, User} from "./models";
+import {Product, Role, User} from "./models";
 
 require('dotenv').config();
 
 import {ShopApplication} from './application';
 import {BcryptHasher} from "./services/hash.password.bcryptjs";
-import {RoleRepository, UserRepository} from "./repositories";
+import {ProductRepository, RoleRepository, UserRepository} from "./repositories";
 import {PermissionKey} from "./authorization";
 import {v1 as uuid} from 'uuid';
 
@@ -75,6 +75,17 @@ export async function migrate(args: string[]) {
   await app.migrateSchema({ existingSchema, models: [ 'Product'] });
   await app.migrateSchema({ existingSchema, models: [ 'Category'] });
   await app.migrateSchema({ existingSchema, models: [ 'Feature'] });
+
+  const productRepo = await app.getRepository(ProductRepository);
+
+  const product = new Product({
+    id: 'test',
+    name: 'test',
+    featureIds: [1, 2]
+  });
+  console.log(product);
+  await productRepo.create(product);
+
 
   // Connectors usually keep a pool of opened connections,
   // this keeps the process running even after all work is done.

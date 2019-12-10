@@ -1,4 +1,9 @@
-import {DefaultCrudRepository, repository, HasManyRepositoryFactory, BelongsToAccessor} from '@loopback/repository';
+import {
+  DefaultCrudRepository,
+  repository,
+  HasManyRepositoryFactory,
+  BelongsToAccessor,
+} from '@loopback/repository';
 import {Category, CategoryRelations, Product} from '../models';
 import {DbDataSource} from '../datasources';
 import {inject, Getter} from '@loopback/core';
@@ -27,7 +32,7 @@ export class CategoryRepository extends DefaultCrudRepository<
     this.parent = this.createBelongsToAccessorFor('parent', Getter.fromValue(this)); // for recursive relationship
     this.registerInclusionResolver('parent', this.parent.inclusionResolver);
 
-    this.products = this.createHasManyRepositoryFactoryFor('products', productRepositoryGetter,);
+    this.products = this.createHasManyRepositoryFactoryFor('products', productRepositoryGetter);
     this.registerInclusionResolver('products', this.products.inclusionResolver);
   }
 }
